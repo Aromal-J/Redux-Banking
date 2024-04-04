@@ -4,17 +4,18 @@ import { deposit, payloan, requestloan, withdraw } from "./AccountSlices";
 
 function AccountOperations() {
   const storeData = useSelector((state) => state);
-  console.log(storeData);
+  console.log("store data is:", storeData);
   const [depositAmount, setDepositAmount] = useState("");
   const [withdrawalAmount, setWithdrawalAmount] = useState("");
   const [loanAmount, setLoanAmount] = useState("");
   const [loanPurpose, setLoanPurpose] = useState("");
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("INR");
   const dispatch = useDispatch();
+
   function handleDeposit() {
-    if (depositAmount) {
-      dispatch(deposit(depositAmount));
-    }
+    if (!depositAmount) return;
+    dispatch(deposit(depositAmount, currency));
+    setDepositAmount("");
   }
 
   function handleWithdrawal() {
@@ -24,7 +25,7 @@ function AccountOperations() {
   }
 
   function handleRequestLoan() {
-    dispatch(requestloan(loanAmount,loanPurpose));
+    dispatch(requestloan(loanAmount, loanPurpose));
   }
 
   function handlePayLoan() {
@@ -46,12 +47,21 @@ function AccountOperations() {
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
           >
+            <option value="INR" style={{ pointerEvents: "none" }}>
+              Indian Rupee
+            </option>
             <option value="USD">US Dollar</option>
             <option value="EUR">Euro</option>
             <option value="GBP">British Pound</option>
           </select>
 
-          <button onClick={handleDeposit}>Deposit {depositAmount}</button>
+          <button
+            onClick={handleDeposit}
+            disabled={storeData.account.isLoading}
+          >
+            {storeData.account.isLoading ? "Converting" : "Deposit"}
+            {depositAmount}
+          </button>
         </div>
 
         <div>
